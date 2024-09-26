@@ -1,0 +1,274 @@
+<link rel= stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script>
+    emailjs.init("u2h-NbveRniCsAtuB"); // Your Public Key
+</script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.wrapper {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.input-box {
+    margin-bottom: 20px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border 0.3s;
+}
+
+.input-box input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.btn {
+    background-color: seagreen;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background-color: seagreen;
+}
+
+#timer {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+}
+#resendSection button{
+  margin-bottom: 2px;
+    background-color: seagreen;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+  
+</style>
+<div class="wrapper">
+    <form id="otpForm" onsubmit="return verifyOtp()">
+        <h1>OTP Verification</h1>
+
+        <!-- OTP Input -->
+        <div class="input-box">
+            <input type="text" id="otpInput" placeholder="Enter OTP" required>
+            <i class="fa-solid fa-lock"></i>
+        </div>
+        <div id="otpError" class="error"></div>
+
+        <!-- Timer Display -->
+        <div id="timer" class="timer"></div>
+ <div id="loadingIndicator" style="display:none;">Sending OTP...</div>
+
+        <!-- Resend OTP Button (hidden until timer expires) -->
+        <div id="resendSection" style="display:none;">
+            <button type="button" id="resendButton" onclick="resendOtp()">Resend OTP</button>
+        </div>
+ 
+        <!-- Submit Button -->
+        <button type="submit" class="btn">Verify OTP</button>
+        
+    </form>
+</div>     
+       <p id="otpError"></p>
+       
+ <script>
+// Remove the extra validateOtp() and keep only verifyOtp()
+
+let otpExpiryTime = localStorage.getItem('otpExpiry');
+let timerInterval;
+
+window.onload = function() {
+    startTimer();
+};
+
+// Function to start the countdown timer
+function startTimer() {
+    const expiryTime = parseInt(otpExpiryTime);
+    const currentTime = Date.now();
+    let timeLeft = Math.floor((expiryTime - currentTime) / 1000);
+
+    if (timeLeft <= 0) {
+        document.getElementById('otpError').innerText = 'OTP has expired. Please request a new one.';
+        document.getElementById('resendSection').style.display = 'block';
+        return;
+    }
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+
+        document.getElementById('timer').innerText = `OTP expires in ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById('timer').innerText = 'OTP expired. Please request a new one.';
+            document.getElementById('resendSection').style.display = 'block';
+        }
+    }, 1000);
+}
+
+// Function to verify the entered OTP
+function verifyOtp() {
+    const enteredOtp = document.getElementById('otpInput').value.trim();
+    const storedOtp = localStorage.getItem('otp');
+
+    document.getElementById('otpError').innerText = '';
+
+    if (!storedOtp || !otpExpiryTime) {
+        document.getElementById('otpError').innerText = 'No OTP found. Please sign up again.';
+        return false;
+    }
+
+    // Check if OTP is expired
+    if (Date.now() > parseInt(otpExpiryTime)) {
+        document.getElementById('otpError').innerText = 'OTP has expired. Please sign up again.';
+        document.getElementById('resendSection').style.display = 'block';
+        return false;
+    }
+
+    // Validate OTP
+    if (enteredOtp === storedOtp) {
+        const pendingUser = JSON.parse(localStorage.getItem('pendingUser'));
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        users.push(pendingUser);
+        localStorage.setItem('users', JSON.stringify(users));
+
+        localStorage.removeItem('pendingUser');
+        localStorage.removeItem('otp');
+        localStorage.removeItem('otpExpiry');
+
+        alert('OTP verified successfully! You are now registered.');
+        window.location.href = 'Signin.html';
+    } else {
+        document.getElementById('otpError').innerText = 'Invalid OTP. Please try again.';
+    }
+
+    return false; // Prevent form submission
+}
+
+// Function to resend OTP
+function resendOtp() {
+    const pendingUser = JSON.parse(localStorage.getItem('pendingUser'));
+    const email = pendingUser.email;
+
+    const newOtp = Math.floor(100000 + Math.random() * 900000);
+    localStorage.setItem('otp', newOtp);
+    localStorage.setItem('otpExpiry', Date.now() + 300000); // New OTP expires in 5 minutes
+
+    // Resend OTP email using EmailJS
+    sendOtpEmail(email, newOtp);
+
+    // Restart the timer
+    otpExpiryTime = localStorage.getItem('otpExpiry');
+    startTimer();
+    
+    document.getElementById('otpError').innerText = '';
+    document.getElementById('resendSection').style.display = 'none';
+}
+
+function sendOtpEmail(email, otp) {
+    const templateParams = {
+        to_email: email,
+        otp: otp
+    };
+
+    emailjs.send("service_yiiqidj", "template_wil44pb", templateParams)
+        .then(function (response) {
+            alert('OTP resent to ' + email);
+        }, function (error) {
+            alert('Failed to resend OTP: ' + error.text);
+        });
+}
+
+   
+ </script>
+<script>
+function resendOtp() {
+    const pendingUser = JSON.parse(localStorage.getItem('pendingUser'));
+    const email = pendingUser.email;
+
+    // Show loading indicator
+    document.getElementById('loadingIndicator').style.display = 'block';
+
+    const newOtp = Math.floor(100000 + Math.random() * 900000);
+    localStorage.setItem('otp', newOtp);
+    localStorage.setItem('otpExpiry', Date.now() + 300000); // New OTP expires in 5 minutes
+
+    // Resend OTP email using EmailJS
+    sendOtpEmail(email, newOtp);
+    
+    // Restart the timer
+    otpExpiryTime = localStorage.getItem('otpExpiry');
+    startTimer();
+    
+    document.getElementById('otpError').innerText = '';
+    document.getElementById('resendSection').style.display = 'none';
+}
+
+function sendOtpEmail(email, otp) {
+    const templateParams = {
+        to_email: email,
+        otp: otp
+    };
+
+    emailjs.send("service_yiiqidj", "template_wil44pb", templateParams)
+        .then(function (response) {
+            alert('OTP resent to ' + email);
+            // Hide loading indicator after successful send
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }, function (error) {
+            alert('Failed to resend OTP: ' + error.text);
+            // Hide loading indicator if there's an error
+            document.getElementById('loadingIndicator').style.display = 'none';
+        });
+}
+
+</script>

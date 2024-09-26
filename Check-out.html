@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Review</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #f4f4f4;
+            padding: 1em;
+            text-align: center;
+        }
+
+        main {
+            padding: 1em;
+        }
+
+        section {
+            margin-bottom: 2em;
+        }
+
+        #address-section, #delivery-date, #cart-items, #order-summary, #checkout {
+            border: 1px solid #ddd;
+            padding: 1em;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        #cart-items img {
+            width: 100px;
+            height: auto;
+            margin-right: 1em;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em;
+        }
+
+        button {
+            padding: 0.5em 1em;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-right: 1em;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="text"] {
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+        #add-new-address{
+         margin-left: 235px;
+        }
+        #edit-address{
+          margin-top: px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Review Your Order</h1>
+    </header>
+
+    <main>
+        <!-- Address Section -->
+        <section id="address-section">
+            <h2>Address Information</h2>
+            <input type="text" id="address-input" value="Your current address here" style="display: none;">
+            <p id="current-address" style="display: inline;">Address: <span>Your current address here</span></p>
+            <button id="edit-address">Edit Address</button>
+            <button id="add-new-address">Add New Address</button>
+        </section>
+
+        <!-- Delivery Date Section -->
+        <section id="delivery-date">
+            <h2>Delivery Date</h2>
+            <p id="delivery-date-info">Estimated Delivery Date: <span>2023-09-30</span></p>
+        </section>
+
+        <!-- Cart Items Section -->
+        <section id="cart-items">
+            <h2>Cart Items</h2>
+            <!-- Cart items will be dynamically inserted here -->
+        </section>
+
+        <!-- Order Summary Section -->
+        <section id="order-summary">
+            <h2>Order Summary</h2>
+            <p id="subtotal">Subtotal: ₹0.00</p>
+            <p id="delivery">Delivery: ₹50.00</p>
+            <p id="total">Total: ₹0.00</p>
+        </section>
+
+        <!-- Checkout Button -->
+        <section id="checkout">
+            <button id="checkout-button">Ship to this Address</button>
+            <button id="print-button">Print Order</button>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartItemsSection = document.getElementById('cart-items');
+            const subtotalElement = document.getElementById('subtotal');
+            const deliveryElement = document.getElementById('delivery');
+            const totalElement = document.getElementById('total');
+            const printButton = document.getElementById('print-button');
+            const editAddressButton = document.getElementById('edit-address');
+            const addNewAddressButton = document.getElementById('add-new-address');
+            const currentAddressSpan = document.getElementById('current-address').querySelector('span');
+            const addressInput = document.getElementById('address-input');
+            const checkoutButton = document.getElementById('checkout-button');
+
+            // Load cart items from localStorage
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let subtotal = 0;
+
+            // Render cart items
+            cart.forEach((item, index) => {
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.classList.add('cart-item');
+                cartItemDiv.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='fallback-image.jpg'">
+                    <div class="cart-item-details">
+                        <h3>${item.name}</h3>
+                        <p>₹${item.price} x ${item.quantity}</p>
+                    </div>
+                    <button onclick="removeItem(${index})">Remove</button>
+                `;
+                cartItemsSection.appendChild(cartItemDiv);
+
+                subtotal += item.price * item.quantity;
+            });
+
+            // Calculate totals
+            const deliveryCost = 0; // Static delivery cost
+            const total = subtotal + deliveryCost;
+
+            subtotalElement.textContent = `Subtotal: ₹${subtotal.toFixed(2)}`;
+            deliveryElement.textContent = `Delivery: ₹${deliveryCost.toFixed(2)}`;
+            totalElement.textContent = `Total: ₹${total.toFixed(2)}`;
+
+            // Print functionality
+            printButton.addEventListener('click', () => {
+                window.print();
+            });
+
+            // Address management
+            editAddressButton.addEventListener('click', () => {
+                addressInput.style.display = 'inline';
+                currentAddressSpan.style.display = 'none';
+                addressInput.value = currentAddressSpan.textContent;
+                addressInput.focus();
+            });
+
+            addressInput.addEventListener('blur', () => {
+                const newAddress = addressInput.value;
+                if (newAddress) {
+                    currentAddressSpan.textContent = newAddress;
+                    localStorage.setItem('address', newAddress);
+                }
+                addressInput.style.display = 'none';
+                currentAddressSpan.style.display = 'inline';
+            });
+
+            addNewAddressButton.addEventListener('click', () => {
+                addressInput.style.display = 'inline';
+                currentAddressSpan.style.display = 'none';
+                addressInput.value = ''; // Clear input for new address
+                addressInput.focus();
+            });
+
+            // Load saved address
+            const savedAddress = localStorage.getItem('address');
+            if (savedAddress) {
+                currentAddressSpan.textContent = savedAddress;
+            }
+
+            // Checkout button
+            checkoutButton.addEventListener('click', () => {
+                if (cart.length > 0) {
+                    window.location.href = 'Paymentpage.html'; // Redirect to payment page
+                } else {
+                    alert('Your cart is empty. Please add items to your cart before checking out.');
+                }
+            });
+        });
+
+        // Function to remove an item from the cart
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            window.location.reload(); // Reload page to update cart
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARMRKTT Login</title>
+    <style>
+        /* Your existing styles */
+
+ *{
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+   font-family: "poppins",sans-serif;
+ }
+  
+ body{
+    display: flex;
+    justify-content: center;
+   align-items: center;
+   min-height: 100vh;
+   background-color: white;
+  background-size: cover;
+  background-position: center;
+     
+  }
+  .wrapper{
+    width: 420px;
+    color: seagreen; 
+    border-radius: 12px;
+    padding: 30px 40px; 
+  }
+  .wrapper h1{
+    font-size: 36px;
+    text-align: center;
+  }
+  .wrapper .input-box{
+    position: relative;
+    width: 100%;
+    height: 50px;
+    
+    margin: 30px 0;
+  }
+  .input-box input{
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    border: 2px solid seagreen;
+    border-radius: 40px; 
+    font-size: 16px;
+    color: black;
+    padding: 20px 45px 20px 20px;
+  }
+  .input-box input::placeholder{
+   color: black;
+  }
+  .input-box i{
+    position: absolute;
+   right: 20px; 
+    top: 30%;
+    transformation: translate(-50%);
+    font-size: 20px;
+    }
+  .wrapper .remember-forgot{
+    display: flex;
+    justify-content:space-between;
+    font-size: 14.5px;
+    margin: -15px 0 15px;  
+  }
+  .remember-forgot label input{
+    accent-color: seagreen;
+    margin-right: 3px;
+  }
+  .remember-forgot a{
+    color: seagreen;
+    text-decoration: none;
+  }
+  .remember-forgot a:hover{
+    text-decoration: underline;
+  }
+  .wrapper .btn{
+    width: 100%;
+    height: 45px;
+    background: seagreen;
+    border: none;
+    outline: none;
+    border-radius: 0px; 
+    box-shadow: 0 0 10px rgba(0,0,0,.1) 
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+  }
+  .wrapper .register-link{
+    font-size: 14.5px;
+    text-align: center;
+    margin-top: 20px 0 15px;
+  }
+  .register-link p a{
+    color: seagreen;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .register-link p a:hover{
+  text-decoration: underline;
+  }
+ .error {
+   color: red;
+    font-size: 14px;
+    margin-top: 10px;
+        }
+
+        /* Optional additional styling for inputs */
+        .input-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 10px;
+            padding-right: 40px;
+            font-size: 16px;
+            border: 1px solid seagreen;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .input-box input:focus {
+            border-color: seagreen;
+        }
+
+        .input-box i {
+            position: absolute;
+            right: 10px;
+            top: 12px;
+            color: seagreen;
+        }
+
+        /* Styling for button */
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: seagreen;
+            color: seagreen;
+            padding: 12px;
+            font-size: 18px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: seagreen;
+        }
+
+        .btn a {
+            color: white;
+            text-decoration: none;
+        }
+
+
+
+    </style>
+<div class="wrapper">
+    <form id="loginForm" onsubmit="return validateLogin()">
+        <h1>FARMRKTT</h1>
+
+        <!-- Username (Email) Input -->
+        <div class="input-box">
+            <input type="text" id="email" placeholder="useremail" required>
+            <i class="fa-solid fa-user"></i>
+        </div>
+        <div id="usernameError" class="error"></div>
+
+        <!-- Password Input -->
+        <div class="input-box">
+            <input type="password" id="password" placeholder="Password" required>
+            <i class="fa-solid fa-lock"></i>
+        </div>
+        <div id="passwordError" class="error"></div>
+
+        <!-- Remember me and Forgot password -->
+        <div class="remember-forgot">
+            <label><input type="checkbox">Remember me</label>
+            <a href="#">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn">LOGIN</button>
+        <p id="errorMessage" style="color: red;"></p>
+
+        <!-- Register Link -->
+        <div class="register-link">
+            <p>Don't have an account? <a href="SignUp.html">Register</a></p>
+        </div>
+    </form>
+</div>
+<script>
+function validateLogin() {
+    const emailField = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    const usernameError = document.getElementById('usernameError');
+    const passwordError = document.getElementById('passwordError');
+    const errorMessageElement = document.getElementById('errorMessage');
+
+    // Email validation pattern
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    // Password validation pattern
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    let isValid = true;
+
+    // Clear previous error messages
+    usernameError.textContent = '';
+    passwordError.textContent = '';
+    errorMessageElement.textContent = '';
+
+    // Validate email
+    if (!emailPattern.test(emailField.value)) {
+        usernameError.textContent = 'Please enter a valid email address.';
+        isValid = false;
+    }
+
+    // Validate password complexity
+    if (!passwordPattern.test(passwordField.value)) {
+        passwordError.textContent = 'Password must be at least 8 characters long, contain one uppercase letter, one number, and one special character.';
+        isValid = false;
+    }
+
+    if (!isValid) {
+        return false; // Prevent form submission if validation fails
+    }
+
+    // Check login credentials if validation passes
+    checkLoginCredentials();
+    return false; // Prevent default form submission to allow custom validation logic
+}
+
+function checkLoginCredentials() {
+    const emailField = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    const errorMessageElement = document.getElementById('errorMessage');
+
+    // Retrieve stored user data from localStorage
+    const storedUser = JSON.parse(localStorage.getItem('userProfile'));
+
+    if (storedUser) {
+        const storedEmail = storedUser.email.toLowerCase();
+        const storedPassword = storedUser.password;
+
+        // Retrieve entered values
+        const enteredEmail = emailField.value.trim().toLowerCase();
+        const enteredPassword = passwordField.value.trim();
+
+        // Compare entered values with stored values
+        if (enteredEmail === storedEmail && enteredPassword === storedPassword) {
+            alert('Login successful!');
+            window.location.href = 'index.html'; // Redirect on successful login
+        } else {
+            errorMessageElement.innerText = 'Wrong email or password';
+        }
+    } else {
+        errorMessageElement.innerText = 'No registered email or password found!';
+    }
+}
+</script>
+<script>
+const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+if (loggedInUser) {
+    // Populate profile fields with loggedInUser data
+    document.getElementById('profileEmail').innerText = loggedInUser.email;
+    // Other profile data...
+} else {
+    alert('No user data found. Please log in.');
+}
+
+</script>
+<script>
+    function validateLogin() {
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const password = document.getElementById('password').value.trim();
+
+        // Clear previous error messages
+        document.getElementById('usernameError').innerText = '';
+        document.getElementById('passwordError').innerText = '';
+
+        // Retrieve registered users from localStorage
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+
+        // Find if user exists with the entered email
+        const existingUser = users.find(user => user.email.toLowerCase() === email);
+
+        if (!existingUser) {
+            document.getElementById('usernameError').innerText = 'Email not found. Please sign up first.';
+            return false;
+        }
+
+        // Check if the entered password matches the user's password
+        if (existingUser.password !== password) {
+            document.getElementById('passwordError').innerText = 'Incorrect password. Please try again.';
+            return false;
+        }
+
+        // Store logged-in user information (for session persistence)
+        localStorage.setItem('loggedInUser', JSON.stringify(existingUser));
+
+        // Redirect to profile or homepage
+        window.location.href = 'index.html';
+        return false; // Prevent form submission
+    }
+</script>
+<script>
+function validateLogin() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const storedUser = JSON.parse(localStorage.getItem(email)); // Retrieve user data
+    const errorMessage = document.getElementById("errorMessage");
+
+    // Clear previous errors
+    errorMessage.textContent = "";
+    document.getElementById("usernameError").textContent = "";
+    document.getElementById("passwordError").textContent = "";
+
+    if (!storedUser) {
+        errorMessage.textContent = "Email not registered. Please sign up first.";
+        return false;
+    }
+
+    if (storedUser.password !== password) {
+        document.getElementById("passwordError").textContent = "Incorrect password.";
+        return false;
+    }
+
+    if (!storedUser.verified) {
+        errorMessage.textContent = "Email not verified. Please check your inbox for the OTP.";
+        return false;
+    }
+
+    // Login successful
+    localStorage.setItem("loggedInUser", email); // Save session
+    window.location.href = "index.html"; // Redirect to index page
+    return false; // Prevent form submission (page reload)
+}
+
+</script>
+<script>
+function validateLogin() {
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value.trim();
+
+    // Clear previous errors
+    document.getElementById("usernameError").textContent = "";
+    document.getElementById("passwordError").textContent = "";
+    const errorMessage = document.getElementById("errorMessage");
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const storedUser = users.find(user => user.email.toLowerCase() === email);
+
+    if (!storedUser) {
+        errorMessage.textContent = "Email not registered. Please sign up first.";
+        return false;
+    }
+
+    if (storedUser.password !== password) {
+        document.getElementById("passwordError").textContent = "Incorrect password.";
+        return false;
+    }
+
+    if (!storedUser.verified) {
+        errorMessage.textContent = "Email not verified. Please check your inbox for the OTP.";
+        return false;
+    }
+
+    // Successful login
+    localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
+    window.location.href = "index.html"; // Redirect to home
+    return false; // Prevent form submission
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const loginForm = document.getElementById('loginForm');
+    loginForm.onsubmit = function() {
+        return validateLogin();
+    };
+
+    function validateLogin() {
+        const emailField = document.getElementById('email');
+        const passwordField = document.getElementById('password');
+        const usernameError = document.getElementById('usernameError');
+        const passwordError = document.getElementById('passwordError');
+        const errorMessageElement = document.getElementById('errorMessage');
+
+        // Clear previous error messages
+        usernameError.innerText = '';
+        passwordError.innerText = '';
+        errorMessageElement.innerText = '';
+
+        const email = emailField.value.trim().toLowerCase();
+        const password = passwordField.value.trim();
+
+        // Retrieve users from localStorage
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const existingUser = users.find(user => user.email.toLowerCase() === email);
+
+        if (!existingUser) {
+            usernameError.innerText = 'Email not registered. Please sign up first.';
+            return false;
+        }
+
+        if (existingUser.password !== password) {
+            passwordError.innerText = 'Incorrect password.';
+            return false;
+        }
+
+        // Successful login
+        localStorage.setItem('loggedInUser', JSON.stringify(existingUser));
+        window.location.href = 'index.html'; // Redirect after successful login
+        return false; // Prevent default form submission
+    }
+});
+
+</script>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        .order-summary {
+            margin: 20px 0;
+        }
+
+        .order-summary h2 {
+            border-bottom: 2px solid #f4f4f4;
+            padding-bottom: 10px;
+            color: #333;
+        }
+
+        .order-details {
+            margin-top: 20px;
+        }
+
+        .order-details p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .order-id {
+            color: #4CAF50;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .product-table th, .product-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .product-table th {
+            background-color: #f4f4f4;
+        }
+
+        .order-total {
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: right;
+            color: #333;
+        }
+
+        .thank-you {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            margin: 20px 0;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        /* Styles from previous example */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Order Confirmation</h1>
+
+        <div class="order-summary">
+            <h2>Thank you for your purchase!</h2>
+            <p>Your order has been successfully placed.</p>
+            <p><strong>Order Number:</strong> <span class="order-id">#123456789</span></p>
+            <p>A confirmation email has been sent to you.</p>
+        </div>
+
+        <div class="order-details">
+            <h3>Order Details</h3>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="orderItems">
+                    <!-- Cart items will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <p class="order-total"><strong>Order Total:</strong> <span id="orderTotal"></span></p>
+        </div>
+
+        <div class="thank-you">
+            <p>We hope to see you again soon!</p>
+            <a href="dashboard.html" class="button">Return to Homepage</a>
+        </div>
+    </div>
+<script>
+// Retrieve cart items from localStorage
+const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Calculate total order price
+let orderTotal = 0;
+
+// Get the table body where products will be listed
+const orderItemsContainer = document.getElementById('orderItems');
+
+// Iterate over the cart and create rows dynamically
+cart.forEach(item => {
+    // Check if item data is valid (e.g., name, quantity, and price are present)
+    if (item.name && item.quantity && item.price) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>₹${item.price.toFixed(2)}</td>
+            <td>₹${(item.quantity * item.price).toFixed(2)}</td>
+        `;
+        orderItemsContainer.appendChild(row);
+        orderTotal += item.quantity * item.price;
+    }
+});
+
+// Display total order price
+document.getElementById('orderTotal').innerText = `₹${orderTotal.toFixed(2)}`;
+</script>
+

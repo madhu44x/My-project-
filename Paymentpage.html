@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .payment-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        .total-amount {
+            font-size: 24px;
+            color: #28a745;
+        }
+        .payment-options {
+            margin-top: 20px;
+        }
+        .payment-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .payment-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="payment-container">
+    <h2>Payment Summary</h2>
+    
+    <p>Total Amount to Pay: <span class="total-amount" id="totalAmount">₹0</span></p>
+    
+    <div class="payment-options">
+        <h3>Select Payment Method:</h3>
+        <label>
+            <input type="radio" name="paymentMethod" value="GooglePay" checked> Google Pay
+        </label><br>
+        <label>
+            <input type="radio" name="paymentMethod" value="PhonePe"> PhonePe
+        </label><br>
+        <label>
+            <input type="radio" name="paymentMethod" value="UPI"> UPI
+        </label>
+    </div>
+
+    <button class="payment-button" id="payButton">Proceed to Pay</button>
+</div>
+
+<script>
+    // Fetch cart total from localStorage
+    function loadCartTotal() {
+        let cartTotal = localStorage.getItem('cartTotal');
+        if (cartTotal) {
+            document.getElementById('totalAmount').innerText = '₹' + cartTotal;
+        } else {
+            document.getElementById('totalAmount').innerText = '₹0'; // Default if no cart total
+        }
+    }
+
+    // Handle payment
+    function handlePayment() {
+        let selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        let totalAmount = localStorage.getItem('cartTotal');
+
+        if (totalAmount) {
+            alert('Proceeding with ' + selectedMethod + ' for ₹' + totalAmount);
+            
+            // Simulate payment gateway redirection
+            let paymentUrl = "https://example-payment-gateway.com/pay?amount=" + totalAmount; // Replace with your payment gateway URL
+            
+            // Here we simulate the payment process
+            fetch(paymentUrl)
+                .then(response => {
+                    if (response.ok) {
+                        // Simulating a successful payment response
+                        window.location.href = "OrderConfirmation.html"; // Change to your actual confirmation page
+                    } else {
+                        // Simulating a failed payment response
+                        alert('Payment failed! Please try again.');
+                    }
+                })
+                .catch(error => {
+                    alert('Payment failed! Please try again.'); // Handle any errors
+                });
+        } else {
+            alert('No cart total found!');
+        }
+    }
+
+    document.getElementById('payButton').addEventListener('click', handlePayment);
+
+    // Load cart total on page load
+    window.onload = loadCartTotal;
+
+    // Function to calculate total cart amount
+    function calculateCartTotal() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let total = 0;
+        cart.forEach(item => {
+            total += item.price * item.quantity;
+        });
+        return total;
+    }
+
+    // Store the cart total in localStorage so it can be accessed on the payment page
+    localStorage.setItem('cartTotal', calculateCartTotal());
+</script>
+
+</body>
+</html>

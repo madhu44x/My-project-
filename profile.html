@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page with Picture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .profile-container {
+            width: 300px;
+            margin: 50px auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            display: block;
+            margin: 10px auto;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .save-button {
+            display: block;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .save-button:hover {
+            background-color: #45a049;
+        }
+        #logoutButton{
+          color: white;
+          padding: 10px;
+          background: red;
+          display: block;
+          border-radius: 5px;
+          cursor: pointer;
+          border: none;
+          font-size: 16px;
+          margin-top: 100px;
+        }
+       #editButton{
+            display: block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            margin-left: 100px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+       } 
+        #deleteAccountBtn{
+          color: red
+                      display: block;
+            background-color: red;
+            color: white;
+            padding: 10px;
+            margin-left: 100px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;;
+          margin-left: 250px;
+        }
+        
+        
+        
+        
+</style>
+<div class="profile-container">
+    <h2>Profile</h2>
+
+    <!-- Current Profile Info -->
+    <img src="default-profile.jpg" alt="Profile Picture" class="profile-pic" id="profilePic">
+    <p>Name: <span id="userName">John Doe</span></p>
+    <p>Email: <span id="userEmail">john@example.com</span></p>
+    <p>Mobile: <span id="userMobile">1234567890</span></p>
+    <p>Address: <span id="userAddress">123 Main St</span></p>
+    
+    <button id="editButton">Edit Profile</button>
+
+    <!-- Edit Profile Section -->
+    <div id="editProfileSection" style="display: none;">
+        <h2>Edit Profile</h2>
+        <input type="file" id="profilePicInput" accept="image/*" class="upload-btn">
+        
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Mobile Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your mobile number" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" name="address" rows="3" placeholder="Enter your address" required></textarea>
+            </div>
+            <button type="submit" class="save-button">Save Changes</button>
+        </form>
+    </div>
+
+    <button id="logoutButton">Logout</button>
+</div>
+<button id="deleteAccountBtn">Delete Account</button>
+<div id="deleteMessage" class="error"></div>
+
+
+<script>
+// Load user data from localStorage
+window.onload = function() {
+    const storedUser = JSON.parse(localStorage.getItem('userProfile'));
+    if (storedUser) {
+        document.getElementById('userName').innerText = `${storedUser.firstName} ${storedUser.lastName}`;
+        document.getElementById('userEmail').innerText = storedUser.email || '';
+        document.getElementById('userMobile').innerText = storedUser.phone || '';
+        document.getElementById('userAddress').innerText = storedUser.address || '';
+    }
+};
+
+const editButton = document.getElementById('editButton');
+const editProfileSection = document.getElementById('editProfileSection');
+const profileForm = document.getElementById('profileForm');
+
+// Show edit form on button click
+editButton.addEventListener('click', () => {
+    editProfileSection.style.display = 'block';
+    
+    // Populate fields with current values from the displayed profile
+    const userName = document.getElementById('userName').innerText.split(" ");
+    document.getElementById('firstName').value = userName[0];
+    document.getElementById('lastName').value = userName[1];
+    document.getElementById('email').value = document.getElementById('userEmail').innerText;
+    document.getElementById('phone').value = document.getElementById('userMobile').innerText;
+    document.getElementById('address').value = document.getElementById('userAddress').innerText;
+});
+
+// Handle form submission
+profileForm.addEventListener('submit', (event) => {
+    event.preventDefault(); // Prevent page reload
+
+    // Update displayed information
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const address = document.getElementById('address').value;
+
+    document.getElementById('userName').innerText = `${firstName} ${lastName}`;
+    document.getElementById('userEmail').innerText = email;
+    document.getElementById('userMobile').innerText = phone;
+    document.getElementById('userAddress').innerText = address;
+
+    // Save updated information to localStorage
+    const updatedUser = { firstName, lastName, email, phone, address };
+    localStorage.setItem('userProfile', JSON.stringify(updatedUser));
+
+    // Hide the edit form
+    editProfileSection.style.display = 'none';
+});
+
+// Profile Picture Preview
+const profilePicInput = document.getElementById('profilePicInput');
+profilePicInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePic').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+// Logout functionality
+const logoutButton = document.getElementById('logoutButton');
+logoutButton.addEventListener('click', () => {
+    localStorage.removeItem('userProfile'); // Clear the user profile data
+    window.location.href = 'Signin.html'; // Redirect to login page
+});
+</script>
+<script>
+const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+if (loggedInUser) {
+    // Populate profile fields with loggedInUser data
+    document.getElementById('profileEmail').innerText = loggedInUser.email;
+    // Other profile data...
+} else {
+    alert('No user data found. Please log in.');
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    if (!loggedInUser) {
+        alert('No user is logged in.');
+        window.location.href = 'Signin.html'; // Redirect to login if no user is logged in
+        return;
+    }
+
+    // Populate profile fields
+    document.getElementById('userName').innerText = loggedInUser.firstName + ' ' + loggedInUser.lastName;
+    document.getElementById('userEmail').innerText = loggedInUser.email;
+    document.getElementById('userMobile').innerText = loggedInUser.mobileNo;
+    document.getElementById('userAddress').innerText = loggedInUser.address;
+
+    // Handle profile picture upload
+    document.getElementById('profilePicInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profilePic').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Edit Profile functionality
+    document.getElementById('editButton').addEventListener('click', function() {
+        document.getElementById('editProfileSection').style.display = 'block';
+        document.getElementById('firstName').value = loggedInUser.firstName;
+        document.getElementById('lastName').value = loggedInUser.lastName;
+        document.getElementById('email').value = loggedInUser.email;
+        document.getElementById('phone').value = loggedInUser.mobileNo;
+        document.getElementById('address').value = loggedInUser.address;
+    });
+
+    // Save Profile Changes
+    document.getElementById('profileForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const updatedUser = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            mobileNo: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+        };
+
+        // Save updated user to localStorage
+        localStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
+
+        // Update the profile display
+        document.getElementById('userName').innerText = updatedUser.firstName + ' ' + updatedUser.lastName;
+        document.getElementById('userEmail').innerText = updatedUser.email;
+        document.getElementById('userMobile').innerText = updatedUser.mobileNo;
+        document.getElementById('userAddress').innerText = updatedUser.address;
+
+        // Hide the edit section
+        document.getElementById('editProfileSection').style.display = 'none';
+    });
+
+    // Logout functionality
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'Signin.html';
+    });
+});
+</script>
+<script>
+window.onload = function() {
+    const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+    
+    if (userProfile) {
+        document.getElementById('userName').innerText = `${userProfile.firstName} ${userProfile.lastName}`;
+        document.getElementById('userEmail').innerText = userProfile.email;
+        document.getElementById('userMobile').innerText = userProfile.phone;
+        document.getElementById('userAddress').innerText = userProfile.address;
+    }
+};
+
+</script>
+<script>
+document.getElementById('deleteAccountBtn').addEventListener('click', deleteAccount);
+
+function deleteAccount() {
+    const confirmation = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    if (confirmation) {
+        // Clear user data
+        localStorage.removeItem('users'); // Clear all users
+        localStorage.removeItem('pendingUser'); // Clear pending user if exists
+        localStorage.removeItem('otp'); // Clear OTP
+        localStorage.removeItem('otpExpiry'); // Clear OTP expiry
+
+        document.getElementById('deleteMessage').innerText = "Your account has been successfully deleted.";
+        // Optionally redirect to the sign-up page
+        setTimeout(() => {
+            window.location.href = 'SignUp.html'; // Adjust this as needed
+        }, 2000);
+    }
+}
+
+</script>
