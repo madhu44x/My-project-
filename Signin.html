@@ -164,23 +164,38 @@
 
 
     </style>
+    <title>Sign In</title>
 </head>
 <body>
 <div class="wrapper">
     <form id="loginForm" onsubmit="return validateLogin()">
         <h1>FARMRKTT</h1>
+
+        <!-- Username (Email) Input -->
         <div class="input-box">
             <input type="text" id="email" placeholder="useremail" required>
             <i class="fa-solid fa-user"></i>
         </div>
         <div id="usernameError" class="error"></div>
+
+        <!-- Password Input -->
         <div class="input-box">
             <input type="password" id="password" placeholder="Password" required>
             <i class="fa-solid fa-lock"></i>
         </div>
         <div id="passwordError" class="error"></div>
+
+        <!-- Remember me and Forgot password -->
+        <div class="remember-forgot">
+            <label><input type="checkbox">Remember me</label>
+            <a href="#">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button -->
         <button type="submit" class="btn">LOGIN</button>
         <p id="errorMessage" style="color: red;"></p>
+
+        <!-- Register Link -->
         <div class="register-link">
             <p>Don't have an account? <a href="SignUp.html">Register</a></p>
         </div>
@@ -242,7 +257,6 @@
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
     if (loggedInUser) {
         // Populate profile fields if necessary
-        // This is only if you have a profile page and you're trying to display logged-in user data
         // Uncomment and modify as needed:
         // document.getElementById('profileEmail').innerText = loggedInUser.email;
     } else {

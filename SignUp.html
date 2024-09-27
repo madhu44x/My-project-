@@ -105,38 +105,32 @@ justify-content: center;
   }
 
   </style>
-
 <div class="wrapper">
     <form id="signUpForm" onsubmit="return validateForm()">
         <h1>FARMRKTT</h1>
 
-        <!-- Email Input -->
         <div class="input-box">
             <input type="text" id="email" placeholder="Email" required>
             <i class="fa-solid fa-user"></i>
         </div>
         <div id="emailError" class="error"></div>
 
-        <!-- Password Input -->
         <div class="input-box">
             <input type="password" id="password" placeholder="Password" required>
             <i class="fa-solid fa-lock"></i>
         </div>
         <div id="passwordError" class="error"></div>
 
-        <!-- Confirm Password Input -->
         <div class="input-box">
             <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
             <i class="fa-solid fa-lock"></i>
         </div>
         <div id="confirmPasswordError" class="error"></div>
 
-        <!-- Terms and Conditions -->
         <div class="agree">
             <label><input type="checkbox" required> Agree to terms & conditions</label>
         </div>
 
-        <!-- Submit Button -->
         <button type="submit" class="btn">Register</button>
 
         <div class="login-link">
@@ -144,13 +138,6 @@ justify-content: center;
         </div>
     </form>
 </div>
-<script>
-    function onSignUpSuccess(newUser) {
-        // Save user data and redirect to verification page
-        localStorage.setItem('loggedInUser', JSON.stringify(newUser));
-        window.location.href = 'Verification.html'; // Redirect to verification
-    }
-</script>
 
 <script>
     function validateForm() {
@@ -191,31 +178,23 @@ justify-content: center;
 
         if (existingUser) {
             document.getElementById('emailError').innerText = 'User already registered with this email.';
-            return false; // Stop further execution if user exists
+            return false; 
         }
 
-        // Create new user object
         const newUser = { email: email, password: password };
-
-        // Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
         localStorage.setItem('pendingUser', JSON.stringify(newUser));
         localStorage.setItem('otp', otp.toString());
-        localStorage.setItem('otpExpiry', Date.now() + 300000); // OTP expires in 5 minutes
+        localStorage.setItem('otpExpiry', Date.now() + 300000);
 
         sendOtpEmail(email, otp);
-
-        return false; // Prevent form submission
+        return false; 
     }
 
     function sendOtpEmail(email, otp) {
-        const templateParams = {
-            to_email: email,
-            otp: otp
-        };
-
+        const templateParams = { to_email: email, otp: otp };
         emailjs.send("service_yiiqidj", "template_wil44pb", templateParams)
-            .then(function (response) {
+            .then(function () {
                 alert('OTP sent to ' + email);
                 window.location.href = "Verificationpage.html";
             }, function (error) {
@@ -223,6 +202,8 @@ justify-content: center;
             });
     }
 </script>
+</body>
+</html>
 
 
 
