@@ -145,6 +145,14 @@ justify-content: center;
     </form>
 </div>
 <script>
+    function onSignUpSuccess(newUser) {
+        // Save user data and redirect to verification page
+        localStorage.setItem('loggedInUser', JSON.stringify(newUser));
+        window.location.href = 'Verification.html'; // Redirect to verification
+    }
+</script>
+
+<script>
     function validateForm() {
         const email = document.getElementById('email').value.trim().toLowerCase();
         const password = document.getElementById('password').value.trim();
@@ -213,5 +221,10 @@ justify-content: center;
             });
     }
 </script>
+
+
+
+
+
 
 

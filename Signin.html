@@ -201,6 +201,14 @@
     </form>
 </div>
 <script>
+    function onSignInSuccess(existingUser) {
+        localStorage.setItem('loggedInUser', JSON.stringify(existingUser));
+        window.location.href = 'index.html'; // Redirect to dashboard
+    }
+</script>
+
+
+<script>
 function validateLogin() {
     const emailField = document.getElementById('email');
     const passwordField = document.getElementById('password');
