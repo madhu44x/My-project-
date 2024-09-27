@@ -207,68 +207,63 @@
     }
 </script>
 
+
+
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const loginForm = document.getElementById('loginForm');
-    loginForm.onsubmit = function() {
-        return validateLogin();
-    };
+function validateLogin() {
+    const emailField = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    const usernameError = document.getElementById('usernameError');
+    const passwordError = document.getElementById('passwordError');
+    const errorMessageElement = document.getElementById('errorMessage');
 
-    function validateLogin() {
-        const emailField = document.getElementById('email');
-        const passwordField = document.getElementById('password');
-        const usernameError = document.getElementById('usernameError');
-        const passwordError = document.getElementById('passwordError');
-        const errorMessageElement = document.getElementById('errorMessage');
+    // Email validation pattern
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        // Email validation pattern
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    // Password validation pattern
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-        // Password validation pattern
-        const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    // Clear previous error messages
+    usernameError.textContent = '';
+    passwordError.textContent = '';
+    errorMessageElement.textContent = '';
 
-        // Clear previous error messages
-        usernameError.innerText = '';
-        passwordError.innerText = '';
-        errorMessageElement.innerText = '';
+    const email = emailField.value.trim().toLowerCase();
+    const password = passwordField.value.trim();
 
-        const email = emailField.value.trim().toLowerCase();
-        const password = passwordField.value.trim();
-
-        // Validate email
-        if (!emailPattern.test(email)) {
-            usernameError.innerText = 'Please enter a valid email address.';
-            return false; // Prevent submission
-        }
-
-        // Validate password complexity
-        if (!passwordPattern.test(password)) {
-            passwordError.innerText = 'Password must be at least 8 characters long, contain one uppercase letter, one number, and one special character.';
-            return false; // Prevent submission
-        }
-
-        // Retrieve users from localStorage
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const existingUser = users.find(user => user.email.toLowerCase() === email);
-
-        if (!existingUser) {
-            usernameError.innerText = 'Email not registered. Please sign up first.';
-            return false;
-        }
-
-        if (existingUser.password !== password) {
-            passwordError.innerText = 'Incorrect password.';
-            return false;
-        }
-
-        // Successful login
-        localStorage.setItem('loggedInUser', JSON.stringify(existingUser));
-        window.location.href = 'index.html'; // Redirect after successful login
-        return false; // Prevent default form submission
+    // Validate email
+    if (!emailPattern.test(email)) {
+        usernameError.textContent = 'Please enter a valid email address.';
+        return false;
     }
-});
 
+    // Validate password
+    if (!passwordPattern.test(password)) {
+        passwordError.textContent = 'Password must contain at least 8 characters, one uppercase letter, one number, and one special character.';
+        return false;
+    }
+
+    // Retrieve registered users from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const existingUser = users.find(user => user.email.toLowerCase() === email);
+
+    if (!existingUser) {
+        usernameError.textContent = 'Email not registered. Please sign up first.';
+        return false;
+    }
+
+    if (existingUser.password !== password) {
+        passwordError.textContent = 'Incorrect password. Please try again.';
+        return false;
+    }
+
+    // Successful login
+    localStorage.setItem('loggedInUser', JSON.stringify(existingUser));
+    window.location.href = 'index.html'; // Redirect to index page
+    return false; // Prevent default form submission
+}
 </script>
+
 
 <script>
 const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -281,30 +276,6 @@ if (loggedInUser) {
     alert('No user data found. Please log in.');
 }
 </script>
-</script>
 
-<script>
-const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
 
-if (loggedInUser) {
-    // Populate profile fields with loggedInUser data
-    document.getElementById('profileEmail').innerText = loggedInUser.email;
-    // Other profile data...
-} else {
-    alert('No user data found. Please log in.');
-}
-</script>
-</script>
-
-<script>
-const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-
-if (loggedInUser) {
-    // Populate profile fields with loggedInUser data
-    document.getElementById('profileEmail').innerText = loggedInUser.email;
-    // Other profile data...
-} else {
-    alert('No user data found. Please log in.');
-}
-</script>
 
