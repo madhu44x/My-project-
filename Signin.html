@@ -263,5 +263,39 @@
         alert('No user data found. Please log in.');
     }
 </script>
+
+
+<script>
+    function validateLogin(event) {
+        event.preventDefault(); // Prevent form submission
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        fetch('/api/login', { // Adjust this URL to your actual login endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Login failed. Please check your credentials.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle successful login (e.g., redirect or show success message)
+            console.log('Login successful:', data);
+            // Redirect or update the UI as needed
+        })
+        .catch(error => {
+            // Display error message
+            document.getElementById('errorMessage').textContent = error.message;
+        });
+    }
+</script>
 </body>
 </html>
+
