@@ -1,4 +1,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
 <link rel= stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -130,6 +132,7 @@ h1 {
 <p id="otpError"></p>
 
 <script>
+
     let otpExpiryTime = localStorage.getItem('otpExpiry');
     let timerInterval;
 
@@ -163,8 +166,8 @@ h1 {
             }
         }, 1000);
     }
+    
 
-    // Verify the entered OTP
     function verifyOtp() {
         const enteredOtp = document.getElementById('otpInput').value.trim();
         const storedOtp = localStorage.getItem('otp');
@@ -238,6 +241,29 @@ h1 {
                 alert('Failed to resend OTP: ' + error.text);
             });
     }
+</script>
+<script>
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBV15bGPRqObgIL_mdSYdrcGDKzq72a0-A",
+  authDomain: "webhosting-6526d.firebaseapp.com",
+  projectId: "webhosting-6526d",
+  storageBucket: "webhosting-6526d.appspot.com",
+  messagingSenderId: "395223629235",
+  appId: "1:395223629235:web:6e930b6d46460bc5e4dfc6",
+  measurementId: "G-NTG8DVV471"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 </script>
 </body>
 </html>
