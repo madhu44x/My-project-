@@ -1,16 +1,23 @@
 <!DOCTYPE html>
+<script>
+ console.log('Current page: ' + window.location.pathname);
+ </script>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <title>FARMRKTT Login</title>
     <style>
-   *{ margin: 0; 
-   padding: 0; 
-   box-sizing: border-box; 
-   font-family: "Poppins", sans-serif; }
-        
+        /* Your existing styles */
+
+ *{
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+   font-family: "poppins",sans-serif;
+ }
+  
  body{
     display: flex;
     justify-content: center;
@@ -160,97 +167,115 @@
         }
 
 
+
     </style>
-</head>
-<body>
 <div class="wrapper">
     <form id="loginForm" onsubmit="return validateLogin()">
         <h1>FARMRKTT</h1>
 
+        <!-- Username (Email) Input -->
         <div class="input-box">
             <input type="text" id="email" placeholder="useremail" required>
             <i class="fa-solid fa-user"></i>
         </div>
         <div id="usernameError" class="error"></div>
 
+        <!-- Password Input -->
         <div class="input-box">
             <input type="password" id="password" placeholder="Password" required>
             <i class="fa-solid fa-lock"></i>
         </div>
         <div id="passwordError" class="error"></div>
 
+        <!-- Remember me and Forgot password -->
         <div class="remember-forgot">
             <label><input type="checkbox">Remember me</label>
             <a href="#">Forgot password?</a>
         </div>
 
+        <!-- Submit Button -->
         <button type="submit" class="btn">LOGIN</button>
         <p id="errorMessage" style="color: red;"></p>
 
+        <!-- Register Link -->
         <div class="register-link">
             <p>Don't have an account? <a href="SignUp.html">Register</a></p>
         </div>
     </form>
 </div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBV15bGPRqObgIL_mdSYdrcGDKzq72a0-A",
-        authDomain: "webhosting-6526d.firebaseapp.com",
-        projectId: "webhosting-6526d",
-        storageBucket: "webhosting-6526d.appspot.com",
-        messagingSenderId: "395223629235",
-        appId: "1:395223629235:web:6e930b6d46460bc5e4dfc6",
-        measurementId: "G-NTG8DVV471"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.validateLogin = function() {
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-        const usernameError = document.getElementById('usernameError');
-        const passwordError = document.getElementById('passwordError');
-        const errorMessageElement = document.getElementById('errorMessage');
-
-        usernameError.textContent = '';
-        passwordError.textContent = '';
-        errorMessageElement.textContent = '';
-
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailPattern.test(email)) {
-            usernameError.textContent = 'Please enter a valid email address.';
-            return false;
-        }
-        if (password.length < 8) {
-            passwordError.textContent = 'Password must be at least 8 characters long.';
-            return false;
-        }
-
-        signInWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                window.location.href = 'index.html'; // Redirect on success
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-
-                if (errorCode === 'auth/user-not-found') {
-                    usernameError.textContent = 'Email not registered. Please sign up first.';
-                } else if (errorCode === 'auth/wrong-password') {
-                    passwordError.textContent = 'Incorrect password. Please try again.';
-                } else {
-                    errorMessageElement.textContent = errorMessage;
-                }
-            });
-
-        return false; // Prevent default form submission
-    };
+<script>
+    function onSignInSuccess(existingUser) {
+        localStorage.setItem('loggedInUser', JSON.stringify(existingUser));
+        window.location.href = 'index.html'; // Redirect to dashboard
+    }
 </script>
 
-</body>
-</html>
+
+
+<script>
+function validateLogin() {
+    const emailField = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    const usernameError = document.getElementById('usernameError');
+    const passwordError = document.getElementById('passwordError');
+    const errorMessageElement = document.getElementById('errorMessage');
+
+    // Email validation pattern
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    // Password validation pattern
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    // Clear previous error messages
+    usernameError.textContent = '';
+    passwordError.textContent = '';
+    errorMessageElement.textContent = '';
+
+    const email = emailField.value.trim().toLowerCase();
+    const password = passwordField.value.trim();
+
+    // Validate email
+    if (!emailPattern.test(email)) {
+        usernameError.textContent = 'Please enter a valid email address.';
+        return false;
+    }
+
+    // Validate password
+    if (!passwordPattern.test(password)) {
+        passwordError.textContent = 'Password must contain at least 8 characters, one uppercase letter, one number, and one special character.';
+        return false;
+    }
+
+    // Retrieve registered users from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const existingUser = users.find(user => user.email.toLowerCase() === email);
+
+    if (!existingUser) {
+        usernameError.textContent = 'Email not registered. Please sign up first.';
+        return false;
+    }
+
+    if (existingUser.password !== password) {
+        passwordError.textContent = 'Incorrect password. Please try again.';
+        return false;
+    }
+
+    // Successful login
+    localStorage.setItem('loggedInUser', JSON.stringify(existingUser));
+    window.location.href = 'index.html'; // Redirect to index page
+    return false; // Prevent default form submission
+}
+</script>
+
+
+<script>
+const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+if (loggedInUser) {
+    // Populate profile fields with loggedInUser data
+    document.getElementById('profileEmail').innerText = loggedInUser.email;
+    // Other profile data...
+} else {
+    alert('No user data found. Please log in.');
+}
+</script>
