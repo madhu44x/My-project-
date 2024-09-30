@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
     <script>
-        (function() {
-            emailjs.init("u2h-NbveRniCsAtuB"); // Your Public Key
-        })();
+        emailjs.init("u2h-NbveRniCsAtuB"); // Your Public Key
     </script>
-
-    <style type="text/css">
+ <style type="text/css">
         @media (max-width: 600px) {
             /* Adjust styles for smaller screens */
             .your-class {
@@ -143,7 +141,7 @@
 </div>
 
 <script>
-    // Firebase initialization
+    // Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyBV15bGPRqObgIL_mdSYdrcGDKzq72a0-A",
         authDomain: "webhosting-6526d.firebaseapp.com",
@@ -154,8 +152,9 @@
         measurementId: "G-NTG8DVV471"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(); // Initialize Firebase Authentication
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth(); // Initialize Firebase Authentication
 
     function validateForm() {
         const email = document.getElementById('email').value.trim().toLowerCase();
@@ -201,15 +200,16 @@
 
         // Create new user in Firebase
         createUser(email, password);
-
         return false; // Prevent default form submission
     }
 
     function createUser(email, password) {
-        auth.createUserWithEmailAndPassword(auth, email, password)
+        auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 // User signed up successfully
                 const newUser = { email: email, password: password };
+                localStorage.setItem('users', JSON.stringify([...JSON.parse(localStorage.getItem('users') || '[]'), newUser]));
+                
                 const otp = Math.floor(100000 + Math.random() * 900000);
                 localStorage.setItem('pendingUser', JSON.stringify(newUser));
                 localStorage.setItem('otp', otp.toString());
@@ -234,6 +234,5 @@
             });
     }
 </script>
-
 </body>
 </html>
