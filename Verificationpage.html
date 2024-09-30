@@ -1,23 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    
+
     <script>
-        emailjs.init("u2h-NbveRniCsAtuB"); // Your EmailJS Public Key
+        // Initialize EmailJS
+        emailjs.init("u2h-NbveRniCsAtuB");
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBV15bGPRqObgIL_mdSYdrcGDKzq72a0-A",
+            authDomain: "webhosting-6526d.firebaseapp.com",
+            projectId: "webhosting-6526d",
+            storageBucket: "webhosting-6526d.appspot.com",
+            messagingSenderId: "395223629235",
+            appId: "1:395223629235:web:6e930b6d46460bc5e4dfc6",
+            measurementId: "G-NTG8DVV471"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); // Initialize Firebase Authentication
     </script>
 
     <style>
-        @media (max-width: 600px) {
-            .your-class {
-                width: 90%;
-                font-size: larger;
-            }
-        }
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -27,7 +38,6 @@
             height: 100vh;
             margin: 0;
         }
-
         .wrapper {
             background: white;
             padding: 20px;
@@ -37,17 +47,14 @@
             width: 100%;
             text-align: center;
         }
-
         h1 {
             font-size: 24px;
             margin-bottom: 20px;
             color: #333;
         }
-
         .input-box {
             margin-bottom: 20px;
         }
-
         .input-box input {
             width: 100%;
             padding: 10px;
@@ -56,18 +63,15 @@
             font-size: 16px;
             transition: border 0.3s;
         }
-
         .input-box input:focus {
             border-color: #007bff;
             outline: none;
         }
-
         .error {
             color: red;
             font-size: 14px;
             margin-top: 10px;
         }
-
         .btn {
             background-color: seagreen;
             color: white;
@@ -78,18 +82,16 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-
         .btn:hover {
-            background-color: seagreen;
+            background-color: darkgreen;
         }
-
         #timer {
             margin-top: 15px;
             font-size: 14px;
             color: #555;
         }
         #resendSection button {
-            margin-bottom: 2px;
+            margin-top: 10px;
             background-color: seagreen;
             color: white;
             padding: 10px 20px;
@@ -102,160 +104,132 @@
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <form id="otpForm" onsubmit="return verifyOtp()">
-            <h1>OTP Verification</h1>
+<div class="wrapper">
+    <form id="otpForm" onsubmit="return verifyOtp()">
+        <h1>OTP Verification</h1>
+        <div class="input-box">
+            <input type="text" id="otpInput" placeholder="Enter OTP" required>
+            <i class="fa-solid fa-lock"></i>
+        </div>
+        <div id="otpError" class="error"></div>
+        <div id="timer" class="timer"></div>
+        <div id="resendSection" style="display:none;">
+            <button type="button" id="resendButton" onclick="resendOtp()">Resend OTP</button>
+        </div>
+        <button type="submit" class="btn">Verify OTP</button>
+    </form>
+</div>
 
-            <!-- OTP Input -->
-            <div class="input-box">
-                <input type="text" id="otpInput" placeholder="Enter OTP" required>
-                <i class="fa-solid fa-lock"></i>
-            </div>
-            <div id="otpError" class="error"></div>
+<script>
+    let otpExpiryTime = localStorage.getItem('otpExpiry');
+    let timerInterval;
 
-            <!-- Timer Display -->
-            <div id="timer" class="timer"></div>
-            <div id="loadingIndicator" style="display:none;">Sending OTP...</div>
+    window.onload = function() {
+        startTimer();
+    };
 
-            <!-- Resend OTP Button (hidden until timer expires) -->
-            <div id="resendSection" style="display:none;">
-                <button type="button" id="resendButton" onclick="resendOtp()">Resend OTP</button>
-            </div>
- 
-            <!-- Submit Button -->
-            <button type="submit" class="btn">Verify OTP</button>
-        </form>
-    </div>     
+    function startTimer() {
+        const expiryTime = parseInt(otpExpiryTime);
+        const currentTime = Date.now();
+        let timeLeft = Math.floor((expiryTime - currentTime) / 1000);
 
-    <script>
-      
-        const firebaseConfig = {
-            apiKey: "AIzaSyBV15bGPRqObgIL_mdSYdrcGDKzq72a0-A",
-            authDomain: "webhosting-6526d.firebaseapp.com",
-            projectId: "webhosting-6526d",
-            storageBucket: "webhosting-6526d.appspot.com",
-            messagingSenderId: "395223629235",
-            appId: "1:395223629235:web:6e930b6d46460bc5e4dfc6"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-   
-    </script>
-      <script>
-      
-        let otpExpiryTime = localStorage.getItem('otpExpiry');
-        let timerInterval;
-
-        window.onload = function() {
-            startTimer();
-        };
-
-        // Function to start the countdown timer
-        function startTimer() {
-            const expiryTime = parseInt(otpExpiryTime);
-            const currentTime = Date.now();
-            let timeLeft = Math.floor((expiryTime - currentTime) / 1000);
-
-            if (timeLeft <= 0) {
-                document.getElementById('otpError').innerText = 'OTP has expired. Please request a new one.';
-                document.getElementById('resendSection').style.display = 'block';
-                return;
-            }
-
-            timerInterval = setInterval(() => {
-                timeLeft--;
-
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-
-                document.getElementById('timer').innerText = `OTP expires in ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById('timer').innerText = 'OTP expired. Please request a new one.';
-                    document.getElementById('resendSection').style.display = 'block';
-                }
-            }, 1000);
+        if (timeLeft <= 0) {
+            document.getElementById('otpError').innerText = 'OTP has expired. Please request a new one.';
+            document.getElementById('resendSection').style.display = 'block';
+            return;
         }
 
-        // Function to verify the entered OTP
-        async function verifyOtp() {
-            const enteredOtp = document.getElementById('otpInput').value.trim();
-            const storedOtp = localStorage.getItem('otp');
+        timerInterval = setInterval(() => {
+            timeLeft--;
 
-            document.getElementById('otpError').innerText = '';
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
 
-            if (!storedOtp || !otpExpiryTime) {
-                document.getElementById('otpError').innerText = 'No OTP found. Please sign up again.';
-                return false;
-            }
+            document.getElementById('timer').innerText = `OTP expires in ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
 
-            // Check if OTP is expired
-            if (Date.now() > parseInt(otpExpiryTime)) {
-                document.getElementById('otpError').innerText = 'OTP has expired. Please sign up again.';
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timer').innerText = 'OTP expired. Please request a new one.';
                 document.getElementById('resendSection').style.display = 'block';
-                return false;
             }
+        }, 1000);
+    }
 
-            // Validate OTP
-            if (enteredOtp === storedOtp) {
-                const pendingUser = JSON.parse(localStorage.getItem('pendingUser'));
-                const userCredential = await auth.createUserWithEmailAndPassword(pendingUser.email, pendingUser.password);
-                
-                // Optional: Store additional user data
-                await db.collection('users').doc(userCredential.user.uid).set({
-                    email: pendingUser.email,
-                    // Add any other user data you need
-                });
+    function verifyOtp() {
+        const enteredOtp = document.getElementById('otpInput').value.trim();
+        const storedOtp = localStorage.getItem('otp');
 
+        document.getElementById('otpError').innerText = '';
+
+        if (!storedOtp || !otpExpiryTime) {
+            document.getElementById('otpError').innerText = 'No OTP found. Please sign up again.';
+            return false;
+        }
+
+        if (Date.now() > parseInt(otpExpiryTime)) {
+            document.getElementById('otpError').innerText = 'OTP has expired. Please sign up again.';
+            document.getElementById('resendSection').style.display = 'block';
+            return false;
+        }
+
+        if (enteredOtp === storedOtp) {
+            const pendingUser = JSON.parse(localStorage.getItem('pendingUser'));
+            storeUserInFirebase(pendingUser.email, pendingUser.password);
+        } else {
+            document.getElementById('otpError').innerText = 'Invalid OTP. Please try again.';
+        }
+
+        return false; // Prevent form submission
+    }
+
+    function storeUserInFirebase(email, password) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                alert('User registered successfully!');
+
+                // Clear local storage
                 localStorage.removeItem('pendingUser');
                 localStorage.removeItem('otp');
                 localStorage.removeItem('otpExpiry');
 
-                alert('OTP verified successfully! You are now registered.');
                 window.location.href = 'Signin.html';
-            } else {
-                document.getElementById('otpError').innerText = 'Invalid OTP. Please try again.';
-            }
+            })
+            .catch((error) => {
+                document.getElementById('otpError').innerText = error.message;
+            });
+    }
 
-            return false; // Prevent form submission
-        }
+    function resendOtp() {
+        const pendingUser = JSON.parse(localStorage.getItem('pendingUser'));
+        const email = pendingUser.email;
 
-        // Function to resend OTP
-        function resendOtp() {
-            const pendingUser = JSON.parse(localStorage.getItem('pendingUser'));
-            const email = pendingUser.email;
+        const newOtp = Math.floor(100000 + Math.random() * 900000);
+        localStorage.setItem('otp', newOtp);
+        localStorage.setItem('otpExpiry', Date.now() + 300000); // New OTP expires in 5 minutes
 
-            const newOtp = Math.floor(100000 + Math.random() * 900000);
-            localStorage.setItem('otp', newOtp);
-            localStorage.setItem('otpExpiry', Date.now() + 300000); // New OTP expires in 5 minutes
+        sendOtpEmail(email, newOtp);
 
-            // Resend OTP email using EmailJS
-            sendOtpEmail(email, newOtp);
+        // Restart the timer
+        otpExpiryTime = localStorage.getItem('otpExpiry');
+        startTimer();
+        document.getElementById('otpError').innerText = '';
+        document.getElementById('resendSection').style.display = 'none';
+    }
 
-            // Restart the timer
-            otpExpiryTime = localStorage.getItem('otpExpiry');
-            startTimer();
-            
-            document.getElementById('otpError').innerText = '';
-            document.getElementById('resendSection').style.display = 'none';
-        }
+    function sendOtpEmail(email, otp) {
+        const templateParams = {
+            to_email: email,
+            otp: otp
+        };
 
-        function sendOtpEmail(email, otp) {
-            const templateParams = {
-                to_email: email,
-                otp: otp
-            };
-
-            emailjs.send("service_yiiqidj", "template_wil44pb", templateParams)
-                .then(function (response) {
-                    alert('OTP resent to ' + email);
-                }, function (error) {
-                    alert('Failed to resend OTP: ' + error.text);
-                });
-        }
-    </script>
+        emailjs.send("service_yiiqidj", "template_wil44pb", templateParams)
+            .then(function (response) {
+                alert('OTP resent to ' + email);
+            }, function (error) {
+                alert('Failed to resend OTP: ' + error.text);
+            });
+    }
+</script>
 </body>
 </html>

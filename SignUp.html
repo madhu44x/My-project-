@@ -6,15 +6,14 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     
     <script>
         emailjs.init("u2h-NbveRniCsAtuB"); // Your Public Key
     </script>
- <style type="text/css">
+
+    <style type="text/css">
+        /* Your existing styles */
         @media (max-width: 600px) {
-            /* Adjust styles for smaller screens */
             .your-class {
                 width: 90%;
                 font-size: larger;
@@ -70,7 +69,7 @@
             position: absolute;
             right: 20px; 
             top: 30%;
-            transformation: translate(-50%);
+            transform: translate(-50%);
             font-size: 20px;
         }
         .agree label input {
@@ -141,21 +140,6 @@
 </div>
 
 <script>
-    // Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBV15bGPRqObgIL_mdSYdrcGDKzq72a0-A",
-        authDomain: "webhosting-6526d.firebaseapp.com",
-        projectId: "webhosting-6526d",
-        storageBucket: "webhosting-6526d.appspot.com",
-        messagingSenderId: "395223629235",
-        appId: "1:395223629235:web:6e930b6d46460bc5e4dfc6",
-        measurementId: "G-NTG8DVV471"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth(); // Initialize Firebase Authentication
-
     function validateForm() {
         const email = document.getElementById('email').value.trim().toLowerCase();
         const password = document.getElementById('password').value.trim();
@@ -198,29 +182,16 @@
             return false; 
         }
 
-        // Create new user in Firebase
-        createUser(email, password);
+        // Store user data and send OTP
+        const newUser = { email, password };
+        localStorage.setItem('pendingUser', JSON.stringify(newUser));
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        localStorage.setItem('otp', otp.toString());
+        localStorage.setItem('otpExpiry', Date.now() + 300000);
+
+        sendOtpEmail(email, otp);
         return false; // Prevent default form submission
-    }
-
-    function createUser(email, password) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // User signed up successfully
-                const newUser = { email: email, password: password };
-                localStorage.setItem('users', JSON.stringify([...JSON.parse(localStorage.getItem('users') || '[]'), newUser]));
-                
-                const otp = Math.floor(100000 + Math.random() * 900000);
-                localStorage.setItem('pendingUser', JSON.stringify(newUser));
-                localStorage.setItem('otp', otp.toString());
-                localStorage.setItem('otpExpiry', Date.now() + 300000);
-
-                sendOtpEmail(email, otp);
-            })
-            .catch((error) => {
-                console.error('Error signing up:', error);
-                document.getElementById('emailError').innerText = error.message; // Display error message
-            });
     }
 
     function sendOtpEmail(email, otp) {
